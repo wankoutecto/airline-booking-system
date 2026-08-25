@@ -1,14 +1,17 @@
-package com.example.airline_booking_system.aircraft;
+package com.example.airline_booking_system.aircraft.aircraftSeat;
 
+import com.example.airline_booking_system.aircraft.Aircraft;
 import com.example.airline_booking_system.aircraft.enums.SeatClass;
 import com.example.airline_booking_system.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "aircraft_seat")
 public class AircraftSeat extends BaseEntity {
 
@@ -17,13 +20,11 @@ public class AircraftSeat extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "aircraft_id", nullable = false)
+    @JoinColumn(name = "aircraft_id")
     private Aircraft aircraft;
 
-    @Column(nullable = false)
     private String seatNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private SeatClass seatClass;
 }

@@ -1,18 +1,13 @@
-package com.dailycodework.shopping_cart.common.response;
+package com.example.airline_booking_system.common.response;
 
-import lombok.Data;
-@Data
-public class ApiResponse {
-    private Object data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class ApiResponse<T> {
+    private T data;
     private String message;
 
-    public ApiResponse(Object data) {
-        this.data = data;
-    }
-
-    public ApiResponse(Object data, String message) {
-        this.data = data;
-        this.message = message;
-    }
 }
 

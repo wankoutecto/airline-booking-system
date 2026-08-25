@@ -1,7 +1,8 @@
-package com.example.airline_booking_system.flight;
+package com.example.airline_booking_system.flight.flightSeat;
 
 import com.example.airline_booking_system.aircraft.enums.SeatClass;
 import com.example.airline_booking_system.common.entity.BaseEntity;
+import com.example.airline_booking_system.flight.Flight;
 import com.example.airline_booking_system.flight.enums.FlightSeatStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +20,7 @@ public class FlightSeat extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "flight_id", nullable = false)
+    @JoinColumn(name = "flight_id")
     private Flight flight;
 
     @Column(nullable = false)

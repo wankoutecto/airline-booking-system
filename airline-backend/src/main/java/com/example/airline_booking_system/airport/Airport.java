@@ -1,13 +1,15 @@
-package com.example.airline_booking_system.flight.airport;
+package com.example.airline_booking_system.airport;
 
 import com.example.airline_booking_system.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "airport")
 public class Airport extends BaseEntity {
     @Id

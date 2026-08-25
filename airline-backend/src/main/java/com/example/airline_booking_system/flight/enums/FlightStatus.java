@@ -1,4 +1,4 @@
-package com.example.airline_booking_system.flight;
+package com.example.airline_booking_system.flight.enums;
 
 public enum FlightStatus {
     SCHEDULED,

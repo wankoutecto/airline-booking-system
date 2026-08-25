@@ -1,25 +1,29 @@
-package com.example.airline_booking_system.flight.airport;
+package com.example.airline_booking_system.aircraft;
 
+import com.example.airline_booking_system.aircraft.enums.AircraftStatus;
+import com.example.airline_booking_system.airport.Airport;
 import com.example.airline_booking_system.common.entity.BaseEntity;
-import com.example.airline_booking_system.flight.enums.AircraftStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "aircraft")
 public class Aircraft extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String code;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private AircraftStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_airport_id")
+    private Airport locationAirport;
 }
