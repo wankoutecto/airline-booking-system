@@ -1,0 +1,4 @@
+package com.example.airline_booking_system.idempotency;
+
+public class IdempotencyService {
+}
