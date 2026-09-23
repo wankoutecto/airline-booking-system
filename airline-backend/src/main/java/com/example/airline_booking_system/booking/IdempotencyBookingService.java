@@ -12,6 +12,7 @@ import com.example.airline_booking_system.flight.flightSeat.FlightSeat;
 import com.example.airline_booking_system.idempotency.Idempotency;
 import com.example.airline_booking_system.idempotency.IdempotencyRepository;
 import com.example.airline_booking_system.idempotency.IdempotencyStatus;
+import com.example.airline_booking_system.messaging.outbox.OutboxService;
 import com.example.airline_booking_system.user.User;
 import com.example.airline_booking_system.user.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,15 +39,17 @@ public class IdempotencyBookingService {
     private final IdempotencyRepository idempotencyRepository;
     private final ObjectMapper objectMapper;
     private final Sha256Util sha256Util;
+    private final OutboxService outboxService;
 
     @Value("${app.idempotency-expiration}")
     private Duration idempotencyExpiration;
+
+
 
     @Transactional
     public BookingResponse createBookingWithIdempotency(Long userId,
                                                         @Valid CreateBookingRequest request,
                                                         String idempotencyKey){
-
 
         try {
             String jsonRequest = objectMapper.writeValueAsString(request);
@@ -60,7 +63,7 @@ public class IdempotencyBookingService {
                     .expiresAt(LocalDateTime.now().plus(idempotencyExpiration))
                     .build();
 
-            //where the race happens
+            //where the concurrency happens
             idempotencyRepository.save(idempotency);
 
             //start booking creation
@@ -71,6 +74,7 @@ public class IdempotencyBookingService {
             FlightSeat flightSeat = bookingRepository
                     .findByFlightIdAndSeatNumberForUpdate(request.getFlightId(), request.getSeatNumber())
                     .orElseThrow(() -> new ResourceNotFoundException("Flight's Seat not found"));
+
 
             if(flightSeat.getStatus() != FlightSeatStatus.AVAILABLE){
                 throw new ResourceNotAvailableException("Seat is already booked");
@@ -92,6 +96,7 @@ public class IdempotencyBookingService {
                     .build();
 
             Booking savedBooking = bookingRepository.save(booking);
+
             flightSeat.setStatus(FlightSeatStatus.BOOKED);
             //end booking
 
@@ -100,6 +105,8 @@ public class IdempotencyBookingService {
             idempotency.setStatus(IdempotencyStatus.COMPLETED);
             idempotency.setResponseStatus(201);
             idempotency.setResponseBody(objectMapper.valueToTree(response));
+
+            outboxService.createEvent("BookingCreated", objectMapper.valueToTree(response));
 
             return response;
         } catch (JsonProcessingException e) {

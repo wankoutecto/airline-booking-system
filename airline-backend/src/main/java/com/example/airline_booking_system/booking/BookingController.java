@@ -22,6 +22,7 @@ import java.util.List;
 public class BookingController {
     private final BookingService bookingService;
 
+
     @PostMapping
     public ResponseEntity<ApiResponse<BookingResponse>> createBooking(
             @RequestHeader("Idempotency-Key") String idempotencyKey,

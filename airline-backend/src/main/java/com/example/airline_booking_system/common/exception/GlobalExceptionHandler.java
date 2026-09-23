@@ -1,6 +1,8 @@
 package com.example.airline_booking_system.common.exception;
 
 import com.example.airline_booking_system.common.response.ApiResponse;
+import com.example.airline_booking_system.security.refresh.InvalidRefreshTokenException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,6 +38,14 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(InvalidFlightRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidFlight(
+            InvalidFlightRequestException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(null, ex.getMessage()));
+    }
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidRefreshToke(
             InvalidFlightRequestException ex) {
 
         return ResponseEntity
@@ -100,5 +110,11 @@ public class GlobalExceptionHandler {
                         ex.getMessage()
                 ));
 
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDatabaseConstraint(DataIntegrityViolationException ex){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(null, "Database constraint violation"));
     }
 }

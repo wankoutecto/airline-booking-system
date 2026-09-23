@@ -4,31 +4,21 @@ import com.example.airline_booking_system.booking.dto.BookingResponse;
 import com.example.airline_booking_system.booking.dto.CreateBookingRequest;
 import com.example.airline_booking_system.common.exception.BookingProcessingException;
 import com.example.airline_booking_system.common.exception.ResourceAlreadyExistsException;
-import com.example.airline_booking_system.common.exception.ResourceNotAvailableException;
 import com.example.airline_booking_system.common.exception.ResourceNotFoundException;
 import com.example.airline_booking_system.common.util.Sha256Util;
 import com.example.airline_booking_system.flight.enums.FlightSeatStatus;
-import com.example.airline_booking_system.flight.flightSeat.FlightSeat;
 import com.example.airline_booking_system.idempotency.Idempotency;
 import com.example.airline_booking_system.idempotency.IdempotencyRepository;
 import com.example.airline_booking_system.idempotency.IdempotencyStatus;
-import com.example.airline_booking_system.user.User;
-import com.example.airline_booking_system.user.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +29,6 @@ public class BookingService {
     private final ObjectMapper objectMapper;
     private final Sha256Util sha256Util;
     private final IdempotencyBookingService idempotencyBookingService;
-
 
 
     public BookingResponse processBooking(Long userId,
@@ -53,7 +42,8 @@ public class BookingService {
         } catch (DataIntegrityViolationException ex) {
 
             try {
-                Optional<Idempotency> idempotency = idempotencyRepository.findByIdempotencyKey(idempotencyKey);
+                Optional<Idempotency> idempotency = idempotencyRepository
+                        .findByIdempotencyKeyAndUserId(idempotencyKey, userId);
 
                 String jsonRequest = objectMapper.writeValueAsString(request);
                 String requestHash = sha256Util.hash(jsonRequest);
@@ -78,7 +68,7 @@ public class BookingService {
             } catch (JsonProcessingException jsonEx) {
                 throw new BookingProcessingException("Failed to process idempotency response");
             }
-
+            System.out.println(ex.getMessage());
             throw  ex;
         }
 

@@ -1,0 +1,2 @@
+alter table idempotency
+drop constraint unique_idempotency_key;

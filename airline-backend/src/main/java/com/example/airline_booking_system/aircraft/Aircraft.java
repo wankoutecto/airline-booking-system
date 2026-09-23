@@ -26,4 +26,7 @@ public class Aircraft extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_airport_id")
     private Airport locationAirport;
+
+    @Version
+    private Long version;
 }

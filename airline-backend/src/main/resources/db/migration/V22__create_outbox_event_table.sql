@@ -1,0 +1,8 @@
+CREATE TABLE outbox_event (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    event_id UUID NOT NULL UNIQUE,
+    event_type VARCHAR(100) NOT NULL,
+    payload JSONB NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);

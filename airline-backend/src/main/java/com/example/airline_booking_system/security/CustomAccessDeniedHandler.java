@@ -1,4 +1,4 @@
-package com.example.airline_booking_system.security.jwt;
+package com.example.airline_booking_system.security;
 
 import com.example.airline_booking_system.common.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAccessDeniedHandler
+public class CustomAccessDeniedHandler
         implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;

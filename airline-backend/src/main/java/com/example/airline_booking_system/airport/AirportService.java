@@ -58,7 +58,6 @@ public class AirportService {
     //@Cacheable is Spring's caching abstraction. Redis is the actual cache storage.
     @Cacheable(value = "airports", key = "#code")
     public AirportResponse findAirport(String code){
-        System.out.println("REQUEST AIRPORT HIT");
         return airportMapper.toAirportResponse(getAirportByCode(code));
     }
 

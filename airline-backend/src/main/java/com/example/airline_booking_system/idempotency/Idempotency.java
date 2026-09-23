@@ -1,9 +1,11 @@
 package com.example.airline_booking_system.idempotency;
 
 import com.example.airline_booking_system.common.entity.CreatedEntity;
+import com.example.airline_booking_system.user.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -20,6 +22,10 @@ public class Idempotency{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String idempotencyKey;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private IdempotencyStatus status;
