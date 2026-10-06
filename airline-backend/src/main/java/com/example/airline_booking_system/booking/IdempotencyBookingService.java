@@ -12,7 +12,11 @@ import com.example.airline_booking_system.flight.flightSeat.FlightSeat;
 import com.example.airline_booking_system.idempotency.Idempotency;
 import com.example.airline_booking_system.idempotency.IdempotencyRepository;
 import com.example.airline_booking_system.idempotency.IdempotencyStatus;
+import com.example.airline_booking_system.messaging.event.AggregateType;
+import com.example.airline_booking_system.messaging.event.EventType;
 import com.example.airline_booking_system.messaging.outbox.OutboxService;
+import com.example.airline_booking_system.payment.Payment;
+import com.example.airline_booking_system.payment.PaymentService;
 import com.example.airline_booking_system.user.User;
 import com.example.airline_booking_system.user.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +44,7 @@ public class IdempotencyBookingService {
     private final ObjectMapper objectMapper;
     private final Sha256Util sha256Util;
     private final OutboxService outboxService;
+    private final PaymentService paymentService;
 
     @Value("${app.idempotency-expiration}")
     private Duration idempotencyExpiration;
@@ -91,14 +96,22 @@ public class IdempotencyBookingService {
             Booking booking = Booking.builder()
                     .bookingReference(reference)
                     .user(user)
-                    .status(BookingStatus.CONFIRMED)
+                    .status(BookingStatus.PENDING_PAYMENT)
                     .flightSeat(flightSeat)
                     .build();
 
             Booking savedBooking = bookingRepository.save(booking);
 
             flightSeat.setStatus(FlightSeatStatus.BOOKED);
-            //end booking
+
+
+            //start payment
+            Payment payment = paymentService.createPayment(savedBooking.getId(),
+                    "BOOKING",
+                    250L,
+                    UUID.randomUUID().toString(),
+                    "USD"
+            );
 
             BookingResponse response = bookingMapper.toBookingResponse(savedBooking);
 
@@ -106,7 +119,11 @@ public class IdempotencyBookingService {
             idempotency.setResponseStatus(201);
             idempotency.setResponseBody(objectMapper.valueToTree(response));
 
-            outboxService.createEvent("BookingCreated", objectMapper.valueToTree(response));
+            outboxService.createEvent(
+                    EventType.BOOKING_CREATED,
+                    savedBooking.getId(),
+                    AggregateType.BOOKING,
+                    objectMapper.valueToTree(response));
 
             return response;
         } catch (JsonProcessingException e) {

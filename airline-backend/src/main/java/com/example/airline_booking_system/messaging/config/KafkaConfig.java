@@ -1,4 +1,4 @@
-package com.example.airline_booking_system.config;
+package com.example.airline_booking_system.messaging.config;
 
 import com.example.airline_booking_system.common.exception.BookingProcessingException;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ public class KafkaConfig {
     public DefaultErrorHandler kafkaErrorHandler(
             KafkaTemplate<String, String> kafkaTemplate) {
 
-        DeadLetterPublishingRecoverer recover =
+        DeadLetterPublishingRecoverer recoverer =
                 new DeadLetterPublishingRecoverer(kafkaTemplate);
 
         ExponentialBackOff backOff =
@@ -28,7 +28,7 @@ public class KafkaConfig {
         backOff.setMaxElapsedTime(10_000L);
 
         DefaultErrorHandler errorHandler =
-                new DefaultErrorHandler(recover, backOff);
+                new DefaultErrorHandler(recoverer, backOff);
 
         errorHandler.addNotRetryableExceptions(
                 BookingProcessingException.class

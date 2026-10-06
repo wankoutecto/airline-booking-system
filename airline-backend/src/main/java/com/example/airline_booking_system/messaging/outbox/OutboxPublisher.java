@@ -25,6 +25,7 @@ public class OutboxPublisher {
                 kafkaMessagePublisher.publish(
                         event.getEventId(),
                         event.getEventType(),
+                        event.getAggregateId(),
                         event.getPayload()
                 );
 

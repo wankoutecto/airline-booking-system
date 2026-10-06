@@ -2,6 +2,7 @@ package com.example.airline_booking_system.common.exception;
 
 import com.example.airline_booking_system.common.response.ApiResponse;
 import com.example.airline_booking_system.security.refresh.InvalidRefreshTokenException;
+import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -114,7 +115,24 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Void>> handleDatabaseConstraint(DataIntegrityViolationException ex){
+        if(isUniqueViolation(ex)){
+           return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new ApiResponse<>(null, "A resource with the provided unique value already exists"));
+        }
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse<>(null, "Database constraint violation"));
+                .body(new ApiResponse<>(null, "Unexpected database constraints violation"));
+    }
+
+    public boolean isUniqueViolation(DataIntegrityViolationException ex){
+        Throwable cause = ex;
+
+        while(cause != null){
+            if(cause instanceof PSQLException psqlException){
+                return "23505".equals(psqlException.getSQLState());
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 }

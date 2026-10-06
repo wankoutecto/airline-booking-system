@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
 import org.postgresql.util.ServerErrorMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class NotificationConsumer {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    @KafkaListener(topics = "booking-events", groupId = "booking-service")
+    @KafkaListener(topics = "${app.kafka.topic.booking-events}", groupId = "${app.kafka.consumer.booking-group}")
     public void consume(String message) {
         try {
             KafkaEvent kafkaEvent = objectMapper.readValue(message, KafkaEvent.class);

@@ -1,5 +1,7 @@
 package com.example.airline_booking_system.messaging.outbox;
 
+import com.example.airline_booking_system.messaging.event.AggregateType;
+import com.example.airline_booking_system.messaging.event.EventType;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,12 @@ import java.util.UUID;
 public class OutboxService {
     private final OutboxEventRepository outboxEventRepository;
 
-    public void createEvent(String eventType, JsonNode payload){
+    public void createEvent(EventType eventType, Long aggregateId, AggregateType aggregateType, JsonNode payload){
         OutboxEvent event = OutboxEvent.builder()
                 .eventId(UUID.randomUUID())
-                .eventType(eventType)
+                .aggregateType(aggregateType.name())
+                .aggregateId(aggregateId)
+                .eventType(eventType.name())
                 .payload(payload)
                 .status(OutboxStatus.UNPUBLISHED)
                 .createdAt(LocalDateTime.now())

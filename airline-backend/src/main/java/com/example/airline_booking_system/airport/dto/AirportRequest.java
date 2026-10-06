@@ -3,8 +3,10 @@ package com.example.airline_booking_system.airport.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class AirportRequest {
     @NotBlank(message = "Departure airport is required")
     @Pattern(

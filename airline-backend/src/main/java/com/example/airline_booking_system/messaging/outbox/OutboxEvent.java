@@ -21,7 +21,8 @@ public class OutboxEvent {
     private Long id;
     private UUID eventId;
     private String eventType;
-
+    private Long aggregateId;
+    private String aggregateType;
     @Enumerated(EnumType.STRING)
     private OutboxStatus status;
 

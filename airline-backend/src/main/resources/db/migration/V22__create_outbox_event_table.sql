@@ -6,3 +6,6 @@ CREATE TABLE outbox_event (
     status VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
+
+
+

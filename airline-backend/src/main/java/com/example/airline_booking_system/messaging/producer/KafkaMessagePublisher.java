@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +20,20 @@ public class KafkaMessagePublisher {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void publish(UUID eventId, String eventType, JsonNode payload) {
+    @Value("${app.kafka.topic.booking-events}")
+    private String bookingEventsTopic;
+
+    public void publish(UUID eventId,
+                        String eventType,
+                        Long aggregateId,
+                        JsonNode payload) {
 
         try {
             String message = objectMapper.writeValueAsString(
                     new KafkaEvent(eventId, eventType, payload)
             );
-
-            kafkaTemplate.send("booking-events", eventId.toString(), message).get();
+            String key = String.valueOf(aggregateId);
+            kafkaTemplate.send(bookingEventsTopic, key, message).get();
 
         } catch (JsonProcessingException e) {
             throw new BookingProcessingException(

@@ -134,11 +134,6 @@ public class FlightService {
 
 
 
-
-
-
-
-
     //Helper method
     public List<FlightSeat> generateFlightSeat(Flight flight){
 
